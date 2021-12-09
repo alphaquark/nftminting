@@ -1,0 +1,10 @@
+function mintBatch(
+        address to_,
+        uint256 boxType_,
+        uint256 amount_
+    ) external onlyRole(MINTER_ROLE) onlySupportedBoxType(boxType_) {
+        require(amount_ > 0, "NFTcollection: amount_ is 0");
+        require(
+            nftCore.totalSupply() + amount_ <= nftCore.cap(),
+            "cap exceeded"
+        );
