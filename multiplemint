@@ -1,0 +1,8 @@
+function mintMultiple(address[] memoryto, uint256[] memorytokenId, string[] memorytokenURI) publicreturns(bool) { 
+    require(hasRole(MINTER_ROLE, _msgSender()), "ERC721PresetMinterPauserAutoId: must have minter role to mint"); 
+    for(uinti = 0; i <to.length; i++) { 
+      _mint(to[i], tokenId[i]); 
+      _setTokenURI(tokenId[i], tokenURI[i]); 
+    } 
+    return true; 
+  }
