@@ -1,0 +1,53 @@
+const csv = require('csv-parser');
+const fs = require('fs');
+const { ethers } = require('ethers');
+const results = [];
+
+const pk = ""; // 프라이빗키 넣으세요
+const provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/");
+// const provider = new ethers.getDefaultProvider();
+
+
+let walletWithProvider = new ethers.Wallet(pk, provider)
+const abi = [
+    "function balanceOf(address _owner) view returns (uint256)",
+    "function owner() view returns (address)",
+    "function name() view returns (string)",
+    "function totalSupply() view returns (uint256)",
+    "function decimals() view returns (uint8)",
+    "function symbol() view returns (string)",
+    "function transfer(address _to, uint256 value) returns (bool success)",
+  ]
+
+const contract = new ethers.Contract("0xE9E73E1aE76D17A16cC53E3e87a9a7dA00000000", abi, walletWithProvider);
+// walletWithProvider.getTransactionCount().then(res => {
+    let nonce = 10232
+    const file = "list.csv"
+    fs.createReadStream(file)
+    .pipe(csv())
+    .on('data', (data) => results.push(data))
+    .on('end', () => {
+        for(const res of results) {
+            const tx = {
+                to: res['to'],
+                value: ethers.utils.parseEther(res['amount']),
+            };
+
+            // console.log(tx);
+            nonce = nonce + 1
+            overrides = {
+                gasPrice: 180 * 1000000000, // 가스값!!!!
+                nonce: nonce,
+            }
+            console.log(tx, res['amount'], overrides)
+            try {
+                // if(nonce > 10461) {
+                    contract.transfer(tx.to, tx.value, overrides).then((tx) => { console.log(tx.hash) });
+                // }
+            } catch (e) {
+                console.error(tx, e)
+            }
+        }
+
+    });
+// });
